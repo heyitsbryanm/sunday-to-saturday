@@ -12,6 +12,8 @@ satToSun = (str, options) => {
         if (!!string) {
             if (string[string.length - 1] === "s") {
                 return string.slice(0, -1)   // removes "s" from string
+            } else {
+                return string
             }
         }
     }
@@ -36,6 +38,9 @@ satToSun = (str, options) => {
     };
 
     fixSorting = (indexPositionFrom, indexPositionTo) => {
+        if(!!options.debug) {
+            console.debug(`Finding the range from ${indexPositionFrom} to ${indexPositionTo}`)
+        }
         // if the value is something like monday - monday, then return all the days 
         if (indexPositionFrom === indexPositionTo) {
             return days
@@ -50,8 +55,8 @@ satToSun = (str, options) => {
     }
 
     // normalize certain characters and words
-    str = str.replace(",", " ");
-    str = str.replace("'", " ");    // removes apostraphes since we can parse it without it
+    str = str.replace(/\,/g, " ");
+    str = str.replace(/\'/g, " ");    // removes apostraphes since we can parse it without it
 
     // if there is a dash, it's a range. Let's get the range of dates
     // we use `0` because it should never begin with a `-`
@@ -60,15 +65,18 @@ satToSun = (str, options) => {
             console.debug(`"-" detected`)
         }
         str = str.split("-");
+
         str = str.map(x => normalizePlurals(x.trim().toLowerCase()))
 
         // get the first day number of a day
         let startDate = days.findIndex(x => x.indexOf(str[0]) > -1)
         let endDate = days.findIndex(x => x.indexOf(str[1]) > -1)
 
-        result = fixSorting(startDate,endDate)
+        if(!!startDate || !!endDate) {
+            console.error(`Error with the dates provided while trying to find a range (${str[0]} to ${str[1]})`)
+        }
 
-        // todo: if end date is farther than start date, we need to re-calculate the range.
+        result = fixSorting(startDate,endDate)
 
     } else if (str.indexOf(" ") > 0) {
         if (!!options.debug) {
@@ -105,7 +113,7 @@ satToSun = (str, options) => {
     if (result.length === 1 && !!result[0]) {
 
         if (!!options.debug) {
-            console.debug(`No type detected. Value is: ${str}`)
+            console.debug(`Only a single value found`)
         }
 
         // returns the single value if that's all there is
