@@ -6,7 +6,7 @@ satToSun = (str, options) => {
     }
     str = str.trim()
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    
+
     // use this function to turn words like "tues" -> "tue"
     normalizePlurals = (string) => {
         if (!!string) {
@@ -35,6 +35,20 @@ satToSun = (str, options) => {
         return result
     };
 
+    fixSorting = (indexPositionFrom, indexPositionTo) => {
+        // if the value is something like monday - monday, then return all the days 
+        if (indexPositionFrom === indexPositionTo) {
+            return days
+        } else if (indexPositionFrom > indexPositionTo) {
+            // if it's some weird shit like Friday - Monday, get those days
+            return [...[...days].splice(0, indexPositionTo + 1), ...[...days].splice(indexPositionFrom, indexPositionFrom)];
+        } else {
+            // default function
+            // calculate the date range
+            return [...days].splice(indexPositionFrom, indexPositionTo)
+        }
+    }
+
     // normalize certain characters and words
     str = str.replace(",", " ");
     str = str.replace("'", " ");    // removes apostraphes since we can parse it without it
@@ -46,23 +60,14 @@ satToSun = (str, options) => {
             console.debug(`"-" detected`)
         }
         str = str.split("-");
-        str = str.map(x => x.trim().toLowerCase())
+        str = str.map(x => normalizePlurals(x.trim().toLowerCase()))
 
         // get the first day number of a day
         let startDate = days.findIndex(x => x.indexOf(str[0]) > -1)
         let endDate = days.findIndex(x => x.indexOf(str[1]) > -1)
 
-        // if the value is something like monday - monday, then return all the days 
-        if (startDate === endDate) {
-            return days
-        } else if (startDate > endDate) {
-            // if it's some weird shit like Friday - Monday, get those days
-            result = [...[...days].splice(0, endDate + 1), ...[...days].splice(startDate, startDate)];
-        } else {
-            // default function
-            // calculate the date range
-            result = [...days].splice(startDate, endDate)
-        }
+        result = fixSorting(startDate,endDate)
+
         // todo: if end date is farther than start date, we need to re-calculate the range.
 
     } else if (str.indexOf(" ") > 0) {
@@ -107,13 +112,13 @@ satToSun = (str, options) => {
         return result
     } else if (!!result) {
         // remove any undfined values
-
         result = result.filter(function (x) {
             return x !== undefined;
         });
     } else {
         console.error(`Error: the output result is not correct. Result is ${result}`)
     }
+
 
     // remove duplicates
     result = [...new Set(result)];
