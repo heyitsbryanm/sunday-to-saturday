@@ -49,7 +49,7 @@ satToSun = (str) => {
     } else if (str.indexOf(" ") > 0) {
         // if there's a space only, it's a list. Let's treat it like one
         // we use `0` cause it should never begin with a ` `
-        result = splitAndFind(' ')
+        result = splitAndFind(str, ' ')
     } else if (str.indexOf('weekend') > -1 || str.indexOf("wknd") > -1 || str.indexOf("end") > -1) {
         result = ["sunday", "saturday"]
     } else if (str.indexOf('weekday') > -1 || str.indexOf("wkday") > -1 || str.indexOf("workday") > -1) {
