@@ -60,7 +60,7 @@ satToSun = (str) => {
     }
 
     // cleanup functions.
-    if(result.length === 1 && !!result[0]) {
+    if (result.length === 1 && !!result[0]) {
         // returns the single value if that's all there is
         return result
     } else if (!!result) {

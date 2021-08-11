@@ -1,6 +1,6 @@
 {
   "name": "saturday-to-sunday",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility function for converting any date text (M-W) to an array of days ([\"monday\", \"tuesday\", \"wednesday\"])",
   "main": "index.js",
   "scripts": {
