@@ -6,6 +6,15 @@ satToSun = (str, options) => {
     }
     str = str.trim()
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    
+    // use this function to turn words like "tues" -> "tue"
+    normalizePlurals = (string) => {
+        if (!!string) {
+            if (string[string.length - 1] === "s") {
+                return string.slice(0, -1)   // removes "s" from string
+            }
+        }
+    }
 
     // re-useable function for splitting strings into this: (["mon","fri"])
     splitAndFind = (str, delimiter) => {
@@ -14,6 +23,7 @@ satToSun = (str, options) => {
         str = str.toLowerCase().trim().split(delimiter);
         str = str.map(x => x.trim())
         str = str.map(x => {
+            x = normalizePlurals(x);
             return days.find(findx => findx.indexOf(x) > -1)
         })
         return str
@@ -24,6 +34,11 @@ satToSun = (str, options) => {
         // if undefined or null, return a blank array
         return result
     };
+
+    // normalize certain characters and words
+    str = str.replace(",", " ");
+    str = str.replace("'", " ");    // removes apostraphes since we can parse it without it
+
     // if there is a dash, it's a range. Let's get the range of dates
     // we use `0` because it should never begin with a `-`
     if (str.indexOf("-") > 0) {
@@ -50,17 +65,13 @@ satToSun = (str, options) => {
         }
         // todo: if end date is farther than start date, we need to re-calculate the range.
 
-    } else if (str.indexOf(",") > 0) {
-        // if there's a comma only, it's a list. Let's treat it like one
-        // we use `0` cause it should never begin with a `,`
-        result = splitAndFind(str, ",")
     } else if (str.indexOf(" ") > 0) {
         if (!!options.debug) {
             console.debug(`space detected`)
         }
         // if there's a space only, it's a list. Let's treat it like one
         // we use `0` cause it should never begin with a ` `
-        result = splitAndFind(str, ' ')
+        result = splitAndFind(str, ' ');
     } else if (str.indexOf('weekend') > -1 || str.indexOf("wknd") > -1 || str.indexOf("end") > -1) {
 
         if (!!options.debug) {
@@ -81,10 +92,10 @@ satToSun = (str, options) => {
             console.debug(`single string detected`)
         }
 
+        str = normalizePlurals(str)
         // if nothing else, that means there's just a single value. In this case, reeturn a single day
         result.push(days.find(x => x.indexOf(str) > -1))
     }
-
     // cleanup functions.
     if (result.length === 1 && !!result[0]) {
 
@@ -96,6 +107,7 @@ satToSun = (str, options) => {
         return result
     } else if (!!result) {
         // remove any undfined values
+
         result = result.filter(function (x) {
             return x !== undefined;
         });
